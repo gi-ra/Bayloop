@@ -48,7 +48,7 @@ beforeAll(async () => {
     email: userA.email,
     password: userA.password,
     email_confirm: true,
-    user_metadata: { role: "customer", workshop_id: workshopId },
+    app_metadata: { role: "customer", workshop_id: workshopId },
   });
   if (errorA || !createdA.user) throw new Error(`Could not create test user A: ${errorA?.message}`);
   userAId = createdA.user.id;
@@ -57,7 +57,7 @@ beforeAll(async () => {
     email: userB.email,
     password: userB.password,
     email_confirm: true,
-    user_metadata: { role: "customer", workshop_id: workshopId },
+    app_metadata: { role: "customer", workshop_id: workshopId },
   });
   if (errorB || !createdB.user) throw new Error(`Could not create test user B: ${errorB?.message}`);
   userBId = createdB.user.id;

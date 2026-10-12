@@ -232,7 +232,7 @@ Build in eight phases, testing each one with the workshop before starting the ne
 
 **After every phase**, ask Claude Code: Review this phase for security problems and bugs, run the tests, and list anything I need to check by hand.
 
-- [ ] Phase 1 Foundations
+- [x] Phase 1 Foundations
 - [ ] Phase 2 Customers, vehicles, bookings
 - [ ] Phase 3 Jobs and technician app
 - [ ] Phase 4 Notifications
