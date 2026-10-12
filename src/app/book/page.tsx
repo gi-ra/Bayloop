@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { createBooking } from "@/app/actions/public-booking";
 
 type Service = {
   id: string;
@@ -102,24 +103,24 @@ export default function BookPage() {
       selectedSlot.getTime() + selectedService.estimated_minutes * 60000,
     );
 
-    const { error } = await supabase.rpc("create_public_booking", {
-      p_workshop_id: workshopId,
-      p_first_name: firstName,
-      p_last_name: lastName,
-      p_phone: phone,
-      p_email: email,
-      p_rego: rego,
-      p_make: make,
-      p_model: model,
-      p_service_id: selectedService.id,
-      p_drop_off_at: selectedSlot.toISOString(),
-      p_pickup_at: pickupAt.toISOString(),
-      p_notes: notes || null,
+    const { error } = await createBooking({
+      workshopId,
+      firstName,
+      lastName,
+      phone,
+      email,
+      rego,
+      make,
+      model,
+      serviceId: selectedService.id,
+      dropOffAt: selectedSlot.toISOString(),
+      pickupAt: pickupAt.toISOString(),
+      notes: notes || null,
     });
 
     setLoading(false);
     if (error) {
-      setError(error.message);
+      setError(error);
       return;
     }
     setStep("confirmed");

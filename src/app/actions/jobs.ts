@@ -2,6 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { sendSms } from "@/lib/sms";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+const STATUS_MESSAGES: Record<string, string> = {
+  checked_in: "We've got your car and will keep you posted as work begins.",
+  on_lift: "Your car is on the hoist now — we'll send findings shortly.",
+  waiting_on_parts: "We're waiting on a part to continue your job.",
+  road_test: "Repairs are done — we're giving it a road test now.",
+  ready: "Your car is ready for pickup!",
+};
 
 async function getOwnWorkshopId() {
   const supabase = await createClient();
@@ -30,23 +41,36 @@ export async function checkInBooking(formData: FormData) {
 
   const { data: booking, error: bookingError } = await supabase
     .from("bookings")
-    .select("id, customer_id, vehicle_id, bay_id, drop_off_at, notes")
+    .select("id, customer_id, vehicle_id, bay_id, drop_off_at, notes, customers(phone)")
     .eq("id", bookingId)
     .single();
   if (bookingError || !booking) throw new Error("Booking not found");
 
-  const { error } = await supabase.from("jobs").insert({
-    workshop_id: workshopId,
-    booking_id: booking.id,
-    customer_id: booking.customer_id,
-    vehicle_id: booking.vehicle_id,
-    bay_id: booking.bay_id,
-    assigned_tech_id: technicianId,
-    promised_at: booking.drop_off_at,
-    customer_notes: booking.notes,
-    status: "checked_in",
-  });
-  if (error) throw new Error(error.message);
+  const { data: job, error } = await supabase
+    .from("jobs")
+    .insert({
+      workshop_id: workshopId,
+      booking_id: booking.id,
+      customer_id: booking.customer_id,
+      vehicle_id: booking.vehicle_id,
+      bay_id: booking.bay_id,
+      assigned_tech_id: technicianId,
+      promised_at: booking.drop_off_at,
+      customer_notes: booking.notes,
+      status: "checked_in",
+    })
+    .select("tracker_token")
+    .single();
+  if (error || !job) throw new Error(error?.message ?? "Could not create job");
+
+  const customerPhone = (booking.customers as unknown as { phone: string | null } | null)?.phone;
+  if (customerPhone) {
+    await sendSms(
+      customerPhone,
+      `${STATUS_MESSAGES.checked_in} Track your car: ${SITE_URL}/track/${job.tracker_token}`,
+      { workshopId, customerId: booking.customer_id },
+    );
+  }
 
   revalidatePath("/admin");
 }
@@ -58,7 +82,7 @@ export async function updateJobStatus(formData: FormData) {
 
   const { data: job, error: jobError } = await supabase
     .from("jobs")
-    .select("id, status, assigned_tech_id, workshop_id")
+    .select("id, status, assigned_tech_id, workshop_id, customer_id, tracker_token, customers(phone)")
     .eq("id", jobId)
     .single();
   if (jobError || !job) throw new Error("Job not found (or you don't have access to it)");
@@ -86,6 +110,16 @@ export async function updateJobStatus(formData: FormData) {
     .update({ status: newStatus, updated_at: new Date().toISOString() })
     .eq("id", jobId);
   if (error) throw new Error(error.message);
+
+  const customerPhone = (job.customers as unknown as { phone: string | null } | null)?.phone;
+  const message = STATUS_MESSAGES[newStatus];
+  if (customerPhone && message) {
+    await sendSms(
+      customerPhone,
+      `${message} Track your car: ${SITE_URL}/track/${job.tracker_token}`,
+      { workshopId: job.workshop_id, customerId: job.customer_id },
+    );
+  }
 
   revalidatePath("/admin");
   revalidatePath("/tech");

@@ -61,9 +61,14 @@ export default async function AdminHomePage() {
     <main className="mx-auto max-w-3xl px-4 py-8">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-xl font-semibold">Diary</h1>
-        <Link href="/admin/customers" className="text-sm underline">
-          Customers
-        </Link>
+        <div className="flex gap-4">
+          <Link href="/admin/inbox" className="text-sm underline">
+            Inbox
+          </Link>
+          <Link href="/admin/customers" className="text-sm underline">
+            Customers
+          </Link>
+        </div>
       </div>
 
       <h2 className="mb-2 text-sm font-semibold uppercase text-gray-500">
