@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { sendSms } from "@/lib/sms";
+import { sendEmail } from "@/lib/email";
 
 type CreateBookingInput = {
   workshopId: string;
@@ -52,6 +53,14 @@ export async function createBooking(input: CreateBookingInput) {
     `Boyta Auto Centre: booking confirmed for ${when}. We'll text you updates as your car moves through the workshop.`,
     { workshopId: input.workshopId },
   );
+  if (input.email) {
+    await sendEmail(
+      input.email,
+      "Booking confirmed — Boyta Auto Centre",
+      `<p>Hi ${input.firstName},</p><p>Your booking is confirmed for <strong>${when}</strong>. We'll keep you posted by text as your car moves through the workshop.</p>`,
+      { workshopId: input.workshopId },
+    );
+  }
 
   return { bookingId };
 }

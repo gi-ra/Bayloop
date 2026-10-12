@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { sendSms } from "@/lib/sms";
+import { sendEmail } from "@/lib/email";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -41,7 +42,7 @@ export async function checkInBooking(formData: FormData) {
 
   const { data: booking, error: bookingError } = await supabase
     .from("bookings")
-    .select("id, customer_id, vehicle_id, bay_id, drop_off_at, notes, customers(phone)")
+    .select("id, customer_id, vehicle_id, bay_id, drop_off_at, notes, customers(phone, email)")
     .eq("id", bookingId)
     .single();
   if (bookingError || !booking) throw new Error("Booking not found");
@@ -63,11 +64,20 @@ export async function checkInBooking(formData: FormData) {
     .single();
   if (error || !job) throw new Error(error?.message ?? "Could not create job");
 
-  const customerPhone = (booking.customers as unknown as { phone: string | null } | null)?.phone;
-  if (customerPhone) {
+  const customer = booking.customers as unknown as { phone: string | null; email: string | null } | null;
+  const trackerUrl = `${SITE_URL}/track/${job.tracker_token}`;
+  if (customer?.phone) {
     await sendSms(
-      customerPhone,
-      `${STATUS_MESSAGES.checked_in} Track your car: ${SITE_URL}/track/${job.tracker_token}`,
+      customer.phone,
+      `${STATUS_MESSAGES.checked_in} Track your car: ${trackerUrl}`,
+      { workshopId, customerId: booking.customer_id },
+    );
+  }
+  if (customer?.email) {
+    await sendEmail(
+      customer.email,
+      "We've got your car — Boyta Auto Centre",
+      `<p>${STATUS_MESSAGES.checked_in}</p><p><a href="${trackerUrl}">Track your car</a></p>`,
       { workshopId, customerId: booking.customer_id },
     );
   }
@@ -82,7 +92,9 @@ export async function updateJobStatus(formData: FormData) {
 
   const { data: job, error: jobError } = await supabase
     .from("jobs")
-    .select("id, status, assigned_tech_id, workshop_id, customer_id, tracker_token, customers(phone)")
+    .select(
+      "id, status, assigned_tech_id, workshop_id, customer_id, tracker_token, customers(phone, email)",
+    )
     .eq("id", jobId)
     .single();
   if (jobError || !job) throw new Error("Job not found (or you don't have access to it)");
@@ -111,12 +123,20 @@ export async function updateJobStatus(formData: FormData) {
     .eq("id", jobId);
   if (error) throw new Error(error.message);
 
-  const customerPhone = (job.customers as unknown as { phone: string | null } | null)?.phone;
+  const jobCustomer = job.customers as unknown as { phone: string | null; email: string | null } | null;
   const message = STATUS_MESSAGES[newStatus];
-  if (customerPhone && message) {
-    await sendSms(
-      customerPhone,
-      `${message} Track your car: ${SITE_URL}/track/${job.tracker_token}`,
+  const trackerUrl = `${SITE_URL}/track/${job.tracker_token}`;
+  if (message && jobCustomer?.phone) {
+    await sendSms(jobCustomer.phone, `${message} Track your car: ${trackerUrl}`, {
+      workshopId: job.workshop_id,
+      customerId: job.customer_id,
+    });
+  }
+  if (message && jobCustomer?.email) {
+    await sendEmail(
+      jobCustomer.email,
+      "Update on your car — Boyta Auto Centre",
+      `<p>${message}</p><p><a href="${trackerUrl}">Track your car</a></p>`,
       { workshopId: job.workshop_id, customerId: job.customer_id },
     );
   }

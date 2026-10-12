@@ -234,8 +234,8 @@ Build in eight phases, testing each one with the workshop before starting the ne
 
 - [x] Phase 1 Foundations
 - [x] Phase 2 Customers, vehicles, bookings
-- [ ] Phase 3 Jobs and technician app
-- [ ] Phase 4 Notifications
+- [x] Phase 3 Jobs and technician app
+- [x] Phase 4 Notifications
 - [ ] Phase 5 Inspections, quotes, approvals
 - [ ] Phase 6 Invoices, payments, Xero
 - [ ] Phase 7 Parts and stock
