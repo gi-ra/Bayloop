@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { updateJobStatus } from "@/app/actions/jobs";
 
@@ -87,6 +88,12 @@ export default async function TechHomePage() {
                     </button>
                   </form>
                 ))}
+                <Link
+                  href={`/tech/jobs/${job.id}`}
+                  className="rounded border px-4 py-3 text-base font-medium"
+                >
+                  Inspection
+                </Link>
               </div>
             </div>
           ))}

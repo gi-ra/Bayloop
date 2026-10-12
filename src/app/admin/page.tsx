@@ -130,7 +130,11 @@ export default async function AdminHomePage() {
           <p className="text-gray-600">No active jobs right now.</p>
         ) : (
           jobs.map((j) => (
-            <div key={j.id} className="rounded border px-4 py-3">
+            <Link
+              key={j.id}
+              href={`/admin/jobs/${j.id}`}
+              className="block rounded border px-4 py-3 hover:bg-gray-50"
+            >
               <div className="mb-1 flex items-center justify-between">
                 <span className="text-sm text-gray-700">
                   {j.customers?.first_name} {j.customers?.last_name} —{" "}
@@ -144,7 +148,7 @@ export default async function AdminHomePage() {
                 {j.bays?.name ?? "No bay"} · Tech: {j.profiles?.first_name}{" "}
                 {j.profiles?.last_name}
               </div>
-            </div>
+            </Link>
           ))
         )}
       </div>
