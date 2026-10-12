@@ -68,6 +68,9 @@ export default async function AdminHomePage() {
           <Link href="/admin/customers" className="text-sm underline">
             Customers
           </Link>
+          <Link href="/admin/settings" className="text-sm underline">
+            Settings
+          </Link>
         </div>
       </div>
 

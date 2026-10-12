@@ -8,7 +8,7 @@ import { sendEmail } from "@/lib/email";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
-async function getOwnWorkshopId() {
+async function getOwnWorkshop() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -22,11 +22,24 @@ async function getOwnWorkshopId() {
     .single();
   if (!profile?.workshop_id) throw new Error("No workshop on this account");
 
-  return { supabase, workshopId: profile.workshop_id as string };
+  const { data: workshop } = await supabase
+    .from("workshops")
+    .select("id, stripe_account_id, stripe_onboarding_complete")
+    .eq("id", profile.workshop_id)
+    .single();
+  if (!workshop) throw new Error("Workshop not found");
+
+  return { supabase, workshop };
 }
 
 export async function createAndSendInvoice(formData: FormData) {
-  const { supabase, workshopId } = await getOwnWorkshopId();
+  const { supabase, workshop } = await getOwnWorkshop();
+  const workshopId = workshop.id;
+  if (!workshop.stripe_onboarding_complete || !workshop.stripe_account_id) {
+    throw new Error(
+      "Connect Stripe in Settings before sending invoices — customers can't pay online yet.",
+    );
+  }
   const jobId = formData.get("job_id") as string;
 
   const { data: job, error: jobError } = await supabase
@@ -79,24 +92,29 @@ export async function createAndSendInvoice(formData: FormData) {
   const customer = job.customers as unknown as { phone: string | null; email: string | null } | null;
 
   const stripe = getStripe();
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    line_items: [
-      {
-        price_data: {
-          currency: "aud",
-          product_data: {
-            name: `${vehicle?.make ?? ""} ${vehicle?.model ?? ""} (${vehicle?.rego ?? ""})`.trim(),
+  const session = await stripe.checkout.sessions.create(
+    {
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: "aud",
+            product_data: {
+              name: `${vehicle?.make ?? ""} ${vehicle?.model ?? ""} (${vehicle?.rego ?? ""})`.trim(),
+            },
+            unit_amount: Math.round(total * 100),
           },
-          unit_amount: Math.round(total * 100),
+          quantity: 1,
         },
-        quantity: 1,
-      },
-    ],
-    success_url: `${SITE_URL}/portal/jobs/${jobId}?paid=1`,
-    cancel_url: `${SITE_URL}/portal/jobs/${jobId}`,
-    metadata: { invoice_id: invoice.id },
-  });
+      ],
+      success_url: `${SITE_URL}/portal/jobs/${jobId}?paid=1`,
+      cancel_url: `${SITE_URL}/portal/jobs/${jobId}`,
+      metadata: { invoice_id: invoice.id },
+    },
+    // Runs on the workshop's own connected Stripe account — the charge,
+    // and the money, belong to them, not to Bayloop's platform account.
+    { stripeAccount: workshop.stripe_account_id },
+  );
 
   const payUrl = session.url!;
   await supabase

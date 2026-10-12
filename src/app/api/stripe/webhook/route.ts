@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+// This one endpoint receives both the platform's own events and events
+// from connected (workshop) accounts — when creating the webhook in the
+// Stripe dashboard, enable "listen to events on connected accounts" so
+// payments made on a workshop's own Stripe account reach this handler.
 export async function POST(request: NextRequest) {
   const signature = request.headers.get("stripe-signature");
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
