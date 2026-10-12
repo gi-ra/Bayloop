@@ -19,6 +19,19 @@ create policy "staff_read_job_photos" on storage.objects
     and (storage.foldername(name))[1] = public.current_workshop_id()::text
   );
 
+-- A customer can view photos for their own jobs (path is
+-- {workshop_id}/{job_id}/{filename} — segment 2 is the job id).
+create policy "customer_read_own_job_photos" on storage.objects
+  for select using (
+    bucket_id = 'job-photos'
+    and public.current_role() = 'customer'
+    and (storage.foldername(name))[2]::uuid in (
+      select j.id from public.jobs j
+      join public.customers c on c.id = j.customer_id
+      where c.profile_id = auth.uid()
+    )
+  );
+
 -- ---------------------------------------------------------------------
 -- Inspections
 -- ---------------------------------------------------------------------

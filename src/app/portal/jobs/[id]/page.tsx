@@ -7,6 +7,7 @@ type InspectionItem = {
   label: string;
   rating: string | null;
   notes: string | null;
+  photo_urls: string[];
 };
 
 type QuoteLine = {
@@ -49,11 +50,19 @@ export default async function CustomerJobDetailPage({
   if (inspection) {
     const { data } = await supabase
       .from("inspection_items")
-      .select("id, label, rating, notes")
+      .select("id, label, rating, notes, photo_urls")
       .eq("inspection_id", inspection.id)
       .not("rating", "is", null)
       .order("sort_order");
     items = data ?? [];
+  }
+
+  const photoSignedUrls: Record<string, string> = {};
+  for (const item of items) {
+    for (const path of item.photo_urls) {
+      const { data } = await supabase.storage.from("job-photos").createSignedUrl(path, 3600);
+      if (data) photoSignedUrls[path] = data.signedUrl;
+    }
   }
 
   const { data: quote } = await supabase
@@ -94,19 +103,33 @@ export default async function CustomerJobDetailPage({
           </h2>
           <div className="mb-6 flex flex-col gap-2">
             {items.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-start justify-between rounded border px-3 py-2"
-              >
-                <div>
-                  <div className="font-medium">{item.label}</div>
-                  {item.notes && <div className="text-sm text-gray-500">{item.notes}</div>}
+              <div key={item.id} className="rounded border px-3 py-2">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="font-medium">{item.label}</div>
+                    {item.notes && <div className="text-sm text-gray-500">{item.notes}</div>}
+                  </div>
+                  <span
+                    className={`rounded px-2 py-0.5 text-xs uppercase ${RATING_COLORS[item.rating!] ?? ""}`}
+                  >
+                    {item.rating}
+                  </span>
                 </div>
-                <span
-                  className={`rounded px-2 py-0.5 text-xs uppercase ${RATING_COLORS[item.rating!] ?? ""}`}
-                >
-                  {item.rating}
-                </span>
+                {item.photo_urls.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {item.photo_urls.map((path) =>
+                      photoSignedUrls[path] ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          key={path}
+                          src={photoSignedUrls[path]}
+                          alt=""
+                          className="h-20 w-20 rounded object-cover"
+                        />
+                      ) : null,
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
