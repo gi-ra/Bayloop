@@ -46,6 +46,14 @@ export async function createVehicle(formData: FormData) {
   const { supabase, workshopId } = await getOwnWorkshopId();
   const customerId = formData.get("customer_id") as string;
 
+  const { data: customer } = await supabase
+    .from("customers")
+    .select("id")
+    .eq("id", customerId)
+    .eq("workshop_id", workshopId)
+    .single();
+  if (!customer) throw new Error("Customer not found in your workshop");
+
   const { error } = await supabase.from("vehicles").insert({
     workshop_id: workshopId,
     customer_id: customerId,

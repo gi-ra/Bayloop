@@ -63,7 +63,8 @@ export default function BookPage() {
     for (let hour = OPEN_HOUR; hour < CLOSE_HOUR; hour++) {
       const start = new Date(`${date}T${String(hour).padStart(2, "0")}:00:00`);
       const end = new Date(start.getTime() + selectedService.estimated_minutes * 60000);
-      if (end.getHours() <= CLOSE_HOUR && end.getMinutes() === 0 || end.getHours() < CLOSE_HOUR) {
+      const endMinutesSinceMidnight = end.getHours() * 60 + end.getMinutes();
+      if (endMinutesSinceMidnight <= CLOSE_HOUR * 60) {
         times.push(start);
       }
     }
