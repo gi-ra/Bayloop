@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { addQuoteLine, sendQuote } from "@/app/actions/quotes";
+import { createAndSendInvoice } from "@/app/actions/invoices";
 
 type InspectionItem = {
   id: string;
@@ -75,6 +76,15 @@ export default async function AdminJobDetailPage({
       .order("created_at");
     quoteLines = data ?? [];
   }
+
+  const hasApprovedLines = quoteLines.some((l) => l.approved === true);
+  const { data: invoice } = await supabase
+    .from("invoices")
+    .select("id, total, status")
+    .eq("job_id", id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
   const customer = job.customers as unknown as {
     first_name: string | null;
@@ -208,6 +218,23 @@ export default async function AdminJobDetailPage({
             </form>
           )}
         </>
+      )}
+
+      <h2 className="mb-2 mt-6 text-sm font-semibold uppercase text-gray-500">Invoice</h2>
+      {invoice ? (
+        <div className="rounded border px-3 py-2">
+          ${invoice.total.toFixed(2)} —{" "}
+          <span className="uppercase">{invoice.status}</span>
+        </div>
+      ) : hasApprovedLines ? (
+        <form action={createAndSendInvoice}>
+          <input type="hidden" name="job_id" value={job.id} />
+          <button type="submit" className="rounded bg-black px-4 py-2 text-white">
+            Send invoice &amp; payment link
+          </button>
+        </form>
+      ) : (
+        <p className="text-gray-600">No approved quote lines to invoice yet.</p>
       )}
     </main>
   );

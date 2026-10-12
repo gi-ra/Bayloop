@@ -83,6 +83,14 @@ export default async function CustomerJobDetailPage({
     quoteLines = data ?? [];
   }
 
+  const { data: invoice } = await supabase
+    .from("invoices")
+    .select("total, status, stripe_checkout_url")
+    .eq("job_id", id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   const vehicle = job.vehicles as unknown as {
     rego: string | null;
     make: string | null;
@@ -181,6 +189,27 @@ export default async function CustomerJobDetailPage({
                 )}
               </div>
             ))}
+          </div>
+        </>
+      )}
+
+      {invoice && (
+        <>
+          <h2 className="mb-2 mt-6 text-sm font-semibold uppercase text-gray-500">Invoice</h2>
+          <div className="rounded border p-3">
+            <div className="mb-2 text-lg font-medium">${invoice.total.toFixed(2)}</div>
+            {invoice.status === "paid" ? (
+              <span className="font-medium text-green-700">Paid — thank you!</span>
+            ) : (
+              invoice.stripe_checkout_url && (
+                <a
+                  href={invoice.stripe_checkout_url}
+                  className="inline-block rounded bg-black px-4 py-2 text-white"
+                >
+                  Pay now
+                </a>
+              )
+            )}
           </div>
         </>
       )}
