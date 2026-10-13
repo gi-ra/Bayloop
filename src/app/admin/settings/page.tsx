@@ -15,9 +15,13 @@ export default async function AdminSettingsPage({
   }
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const { data: profile } = await supabase
     .from("profiles")
     .select("workshop_id")
+    .eq("id", user?.id ?? "")
     .single();
   const { data: workshop } = await supabase
     .from("workshops")

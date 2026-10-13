@@ -4,7 +4,14 @@ import { getJobProfitRows } from "@/lib/reports";
 
 export default async function ReportsPage() {
   const supabase = await createClient();
-  const { data: profile } = await supabase.from("profiles").select("workshop_id").single();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("workshop_id")
+    .eq("id", user?.id ?? "")
+    .single();
   const workshopId = profile?.workshop_id as string;
 
   const jobProfitRows = await getJobProfitRows(supabase, workshopId);
