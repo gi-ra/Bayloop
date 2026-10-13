@@ -22,10 +22,12 @@ export function LogoUpload({
     setUploading(true);
     setError(null);
 
+    // Each path is already unique (timestamped), so there's never a real
+    // file to overwrite — plain insert, no upsert needed.
     const path = `${workshopId}/logo-${Date.now()}-${file.name}`;
     const { error: uploadError } = await supabase.storage
       .from("workshop-logos")
-      .upload(path, file, { upsert: true });
+      .upload(path, file);
 
     if (uploadError) {
       setUploading(false);
