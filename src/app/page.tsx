@@ -48,7 +48,7 @@ export default function Home() {
           href="/staff/login"
           className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium"
         >
-          Staff login
+          Login
         </Link>
       </header>
 
@@ -65,7 +65,7 @@ export default function Home() {
           href="/staff/login"
           className="inline-block rounded-full bg-[var(--brand)] px-8 py-3 font-semibold text-white transition-opacity hover:opacity-90"
         >
-          Staff login
+          Login
         </Link>
       </section>
 
