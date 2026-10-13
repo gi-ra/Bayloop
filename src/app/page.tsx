@@ -1,7 +1,10 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
-import { getWorkshopBranding } from "@/lib/branding";
 import { AuthLogo } from "@/components/auth-card";
+
+// This is Bayloop's own product homepage — generic branding, not any
+// one workshop's. Individual workshops' own branding (logo/color) shows
+// up on their login, booking, and tracker pages instead, not here.
+const BAYLOOP_BRAND_COLOR = "#2F7A73";
 
 const FEATURES = [
   {
@@ -33,16 +36,13 @@ const FEATURES = [
   },
 ];
 
-export default async function Home() {
-  const supabase = await createClient();
-  const branding = await getWorkshopBranding(supabase);
-
+export default function Home() {
   return (
-    <main style={{ ["--brand" as string]: branding.brandColor }}>
+    <main style={{ ["--brand" as string]: BAYLOOP_BRAND_COLOR }}>
       <header className="flex items-center justify-between px-6 py-5">
         <div className="flex items-center gap-2">
-          <AuthLogo logoUrl={branding.logoUrl} brandColor={branding.brandColor} />
-          <span className="text-lg font-bold">{branding.name}</span>
+          <AuthLogo brandColor={BAYLOOP_BRAND_COLOR} />
+          <span className="text-lg font-bold">Bayloop</span>
         </div>
         <Link
           href="/staff/login"
@@ -85,7 +85,7 @@ export default async function Home() {
       </section>
 
       <footer className="px-6 py-8 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} {branding.name}
+        © {new Date().getFullYear()} Bayloop
       </footer>
     </main>
   );
