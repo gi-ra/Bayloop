@@ -239,7 +239,7 @@ Build in eight phases, testing each one with the workshop before starting the ne
 - [x] Phase 5 Inspections, quotes, approvals
 - [x] Phase 6 Invoices, payments, Xero (Xero sync deferred — optional per phase plan)
 - [x] Phase 7 Parts and stock
-- [ ] Phase 8 Owner dashboard and extras
+- [x] Phase 8 Owner dashboard (reports built; AI assistant, predictive reminders, fleet accounts deferred as follow-ups)
 
 ## Sources
 
