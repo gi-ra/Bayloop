@@ -60,10 +60,14 @@ export async function connectStripe() {
     });
     accountId = account.id;
 
-    await supabase
+    const { error, data } = await supabase
       .from("workshops")
       .update({ stripe_account_id: accountId })
-      .eq("id", workshop.id);
+      .eq("id", workshop.id)
+      .select("id");
+    if (error || !data || data.length === 0) {
+      throw new Error(error?.message ?? "Could not save the connected Stripe account");
+    }
   }
 
   const accountLink = await stripe.accountLinks.create({
@@ -86,8 +90,12 @@ export async function refreshStripeStatus() {
   const account = await stripe.v2.core.accounts.retrieve(workshop.stripe_account_id);
   const ready = account.configuration?.merchant?.capabilities?.card_payments?.status === "active";
 
-  await supabase
+  const { error, data } = await supabase
     .from("workshops")
     .update({ stripe_onboarding_complete: ready })
-    .eq("id", workshop.id);
+    .eq("id", workshop.id)
+    .select("id");
+  if (error || !data || data.length === 0) {
+    throw new Error(error?.message ?? "Could not save Stripe connection status");
+  }
 }
