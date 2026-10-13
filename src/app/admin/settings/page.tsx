@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { connectStripe, refreshStripeStatus } from "@/app/actions/stripe-connect";
-import { updateBranding } from "@/app/actions/branding";
+import { updateBrandColor } from "@/app/actions/branding";
+import { LogoUpload } from "@/components/logo-upload";
 
 export default async function AdminSettingsPage({
   searchParams,
@@ -59,7 +60,7 @@ export default async function AdminSettingsPage({
         Controls the look of your public pages: homepage, booking, customer login, and the
         live tracker link customers get texted.
       </p>
-      <form action={updateBranding} className="flex flex-col gap-3">
+      <form action={updateBrandColor} className="mb-6 flex flex-col gap-3">
         <div>
           <label className="mb-1 block text-sm font-medium">Brand color</label>
           <input
@@ -69,24 +70,18 @@ export default async function AdminSettingsPage({
             className="h-10 w-20 rounded border"
           />
         </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium">Logo URL (optional)</label>
-          <input
-            name="logo_url"
-            type="url"
-            placeholder="https://..."
-            defaultValue={workshop?.logo_url ?? ""}
-            className="w-full rounded border px-3 py-2 text-sm"
-          />
-          <p className="mt-1 text-xs text-gray-500">
-            Link to an image hosted elsewhere (e.g. from your marketing site). Leave blank to
-            use the default Bayloop logo mark in your brand color.
-          </p>
-        </div>
         <button type="submit" className="self-start rounded bg-black px-4 py-2 text-white">
-          Save branding
+          Save color
         </button>
       </form>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium">Logo</label>
+        <LogoUpload
+          workshopId={profile?.workshop_id ?? ""}
+          currentLogoUrl={workshop?.logo_url ?? null}
+        />
+      </div>
     </main>
   );
 }

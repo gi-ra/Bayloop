@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-export async function updateBranding(formData: FormData) {
+async function getOwnWorkshopId() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -17,20 +17,58 @@ export async function updateBranding(formData: FormData) {
     .single();
   if (!profile?.workshop_id) throw new Error("No workshop on this account");
 
-  const brandColor = formData.get("brand_color") as string;
-  const logoUrl = (formData.get("logo_url") as string) || null;
+  return { supabase, workshopId: profile.workshop_id as string };
+}
 
-  const { error, data } = await supabase
-    .from("workshops")
-    .update({ brand_color: brandColor, logo_url: logoUrl })
-    .eq("id", profile.workshop_id)
-    .select("id");
-  if (error || !data || data.length === 0) {
-    throw new Error(error?.message ?? "Could not save branding");
-  }
-
+function revalidateBrandedPages() {
   revalidatePath("/admin/settings");
   revalidatePath("/");
   revalidatePath("/book");
   revalidatePath("/portal/login");
+}
+
+export async function updateBrandColor(formData: FormData) {
+  const { supabase, workshopId } = await getOwnWorkshopId();
+  const brandColor = formData.get("brand_color") as string;
+
+  const { error, data } = await supabase
+    .from("workshops")
+    .update({ brand_color: brandColor })
+    .eq("id", workshopId)
+    .select("id");
+  if (error || !data || data.length === 0) {
+    throw new Error(error?.message ?? "Could not save brand color");
+  }
+
+  revalidateBrandedPages();
+}
+
+export async function setWorkshopLogo(logoUrl: string) {
+  const { supabase, workshopId } = await getOwnWorkshopId();
+
+  const { error, data } = await supabase
+    .from("workshops")
+    .update({ logo_url: logoUrl })
+    .eq("id", workshopId)
+    .select("id");
+  if (error || !data || data.length === 0) {
+    throw new Error(error?.message ?? "Could not save logo");
+  }
+
+  revalidateBrandedPages();
+}
+
+export async function removeWorkshopLogo() {
+  const { supabase, workshopId } = await getOwnWorkshopId();
+
+  const { error, data } = await supabase
+    .from("workshops")
+    .update({ logo_url: null })
+    .eq("id", workshopId)
+    .select("id");
+  if (error || !data || data.length === 0) {
+    throw new Error(error?.message ?? "Could not remove logo");
+  }
+
+  revalidateBrandedPages();
 }
