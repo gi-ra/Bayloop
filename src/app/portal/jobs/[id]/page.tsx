@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { customerDecideQuoteLine } from "@/app/actions/quotes";
+import { MediaThumb } from "@/components/media-thumb";
 
 type InspectionItem = {
   id: string;
@@ -127,11 +128,10 @@ export default async function CustomerJobDetailPage({
                   <div className="mt-2 flex flex-wrap gap-2">
                     {item.photo_urls.map((path) =>
                       photoSignedUrls[path] ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <MediaThumb
                           key={path}
-                          src={photoSignedUrls[path]}
-                          alt=""
+                          path={path}
+                          url={photoSignedUrls[path]}
                           className="h-20 w-20 rounded object-cover"
                         />
                       ) : null,

@@ -27,7 +27,10 @@ export default async function TechLayout({
   const branding = await getWorkshopBranding(supabase);
 
   return (
-    <div>
+    <div
+      className="min-h-screen bg-[#F7F8FA]"
+      style={{ ["--brand" as string]: branding.brandColor }}
+    >
       <DashboardHeader branding={branding} label="Technician" />
       {children}
     </div>

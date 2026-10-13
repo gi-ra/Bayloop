@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { startInspection, updateInspectionItem } from "@/app/actions/inspections";
 import { requestPart } from "@/app/actions/parts";
 import { PhotoUpload } from "@/components/photo-upload";
+import { MediaThumb } from "@/components/media-thumb";
 
 type PartsRequest = {
   id: string;
@@ -150,11 +151,10 @@ export default async function TechJobDetailPage({
               <div className="mt-2 flex flex-wrap gap-2">
                 {item.photo_urls.map((path) =>
                   photoSignedUrls[path] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <MediaThumb
                       key={path}
-                      src={photoSignedUrls[path]}
-                      alt=""
+                      path={path}
+                      url={photoSignedUrls[path]}
                       className="h-16 w-16 rounded object-cover"
                     />
                   ) : null,

@@ -41,10 +41,10 @@ export function PhotoUpload({
   return (
     <div>
       <label className="inline-block cursor-pointer rounded border px-3 py-2 text-sm">
-        {uploading ? "Uploading..." : "Add photo"}
+        {uploading ? "Uploading..." : "Add photo or video"}
         <input
           type="file"
-          accept="image/*"
+          accept="image/*,video/*"
           capture="environment"
           onChange={handleFile}
           disabled={uploading}

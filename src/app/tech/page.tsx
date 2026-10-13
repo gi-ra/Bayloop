@@ -23,6 +23,13 @@ const NEXT_STATUS_BUTTONS: Record<string, { label: string; status: string }[]> =
   road_test: [{ label: "Done", status: "ready" }],
 };
 
+const STATUS_COLORS: Record<string, string> = {
+  checked_in: "bg-blue-100 text-blue-700",
+  on_lift: "bg-teal-100 text-teal-700",
+  waiting_on_parts: "bg-orange-100 text-orange-700",
+  road_test: "bg-indigo-100 text-indigo-700",
+};
+
 export default async function TechHomePage() {
   const supabase = await createClient();
   const {
@@ -41,21 +48,33 @@ export default async function TechHomePage() {
 
   return (
     <main className="mx-auto max-w-lg px-4 py-6">
-      <h1 className="mb-4 text-xl font-semibold">My jobs today</h1>
+      <h1 className="mb-5 text-2xl font-bold text-gray-900">Run sheet</h1>
 
       {!jobs || jobs.length === 0 ? (
-        <p className="text-gray-600">No jobs assigned right now.</p>
+        <p className="rounded-xl border bg-white px-5 py-8 text-center text-gray-500 shadow-sm">
+          No jobs assigned right now.
+        </p>
       ) : (
         <div className="flex flex-col gap-4">
           {jobs.map((job) => (
-            <div key={job.id} className="rounded border p-4">
-              <div className="mb-1 text-lg font-medium">
-                {job.vehicles?.make} {job.vehicles?.model} ({job.vehicles?.rego})
+            <div key={job.id} className="rounded-2xl border bg-white p-5 shadow-sm">
+              <div className="mb-2 flex items-start justify-between gap-2">
+                <div>
+                  <div className="text-lg font-bold text-gray-900">
+                    {job.vehicles?.make} {job.vehicles?.model} ({job.vehicles?.rego})
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {job.customers?.first_name} {job.customers?.last_name} ·{" "}
+                    {job.bays?.name ?? "No bay"}
+                  </div>
+                </div>
+                <span
+                  className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${STATUS_COLORS[job.status] ?? "bg-gray-100 text-gray-700"}`}
+                >
+                  {job.status.replaceAll("_", " ")}
+                </span>
               </div>
-              <div className="mb-1 text-sm text-gray-600">
-                {job.customers?.first_name} {job.customers?.last_name} ·{" "}
-                {job.bays?.name ?? "No bay"}
-              </div>
+
               {job.promised_at && (
                 <div className="mb-1 text-sm text-gray-500">
                   Promised:{" "}
@@ -66,14 +85,10 @@ export default async function TechHomePage() {
                 </div>
               )}
               {job.customer_notes && (
-                <div className="mb-2 text-sm italic text-gray-500">
+                <div className="mb-3 text-sm italic text-gray-500">
                   &quot;{job.customer_notes}&quot;
                 </div>
               )}
-
-              <div className="mb-2 inline-block rounded bg-gray-100 px-2 py-0.5 text-xs uppercase text-gray-600">
-                {job.status.replaceAll("_", " ")}
-              </div>
 
               <div className="flex flex-wrap gap-2">
                 {(NEXT_STATUS_BUTTONS[job.status] ?? []).map((btn) => (
@@ -82,7 +97,7 @@ export default async function TechHomePage() {
                     <input type="hidden" name="status" value={btn.status} />
                     <button
                       type="submit"
-                      className="rounded bg-black px-4 py-3 text-base font-medium text-white"
+                      className="rounded-full bg-[var(--brand)] px-5 py-3 text-base font-semibold text-white"
                     >
                       {btn.label}
                     </button>
@@ -90,7 +105,7 @@ export default async function TechHomePage() {
                 ))}
                 <Link
                   href={`/tech/jobs/${job.id}`}
-                  className="rounded border px-4 py-3 text-base font-medium"
+                  className="rounded-full border border-gray-300 px-5 py-3 text-base font-semibold text-gray-700"
                 >
                   Inspection
                 </Link>

@@ -47,10 +47,44 @@ export default async function AdminHomePage() {
   ]);
 
   const notYetCheckedIn = (bookings ?? []).filter((b) => !b.jobs || b.jobs.length === 0);
+  const currentlyWorking = (jobs ?? []).filter((j) => ["on_lift", "road_test"].includes(j.status));
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-8">
       <h1 className="mb-6 text-2xl font-bold text-gray-900">Diary</h1>
+
+      <div className="mb-8 overflow-hidden rounded-xl border bg-white shadow-sm">
+        <div className="border-b px-5 py-3">
+          <h2 className="font-semibold text-gray-900">Working right now</h2>
+        </div>
+        {currentlyWorking.length === 0 ? (
+          <p className="px-5 py-8 text-center text-sm text-gray-500">
+            No one&apos;s actively on a job right now.
+          </p>
+        ) : (
+          <div className="divide-y">
+            {currentlyWorking.map((j) => (
+              <div key={j.id} className="flex items-center justify-between px-5 py-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+                  </span>
+                  <span className="font-medium text-gray-900">
+                    {j.profiles?.first_name} {j.profiles?.last_name}
+                  </span>
+                  <span className="text-gray-500">
+                    — {j.vehicles?.make} {j.vehicles?.model} ({j.vehicles?.rego})
+                  </span>
+                </div>
+                <span className="rounded-full bg-teal-100 px-2.5 py-1 text-xs font-medium text-teal-700">
+                  {j.status === "on_lift" ? "On the lift" : "Road test"}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="mb-8 overflow-hidden rounded-xl border bg-white shadow-sm">
         <div className="border-b px-5 py-3">
