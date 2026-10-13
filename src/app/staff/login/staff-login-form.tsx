@@ -93,32 +93,35 @@ export function StaffLoginForm({ branding }: { branding: WorkshopBranding }) {
     router.refresh();
   }
 
+  const dark = branding.staffTheme === "dark";
+
   return (
     <AuthCard
       title={step === "password" ? "Staff login" : "Enter your two-factor code"}
       logoUrl={branding.logoUrl}
       brandColor={branding.brandColor}
+      dark={dark}
     >
       {step === "password" ? (
         <form onSubmit={signIn}>
-          <AuthField label="Email" required>
+          <AuthField label="Email" required dark={dark}>
             <input
               id="email"
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={authInputClass}
+              className={authInputClass(dark)}
             />
           </AuthField>
-          <AuthField label="Password" required>
+          <AuthField label="Password" required dark={dark}>
             <input
               id="password"
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={authInputClass}
+              className={authInputClass(dark)}
             />
           </AuthField>
           <button type="submit" disabled={loading} className={authButtonClass}>
@@ -127,7 +130,7 @@ export function StaffLoginForm({ branding }: { branding: WorkshopBranding }) {
         </form>
       ) : (
         <form onSubmit={verifyMfa}>
-          <AuthField label="Code from your authenticator app" required>
+          <AuthField label="Code from your authenticator app" required dark={dark}>
             <input
               id="code"
               type="text"
@@ -136,7 +139,7 @@ export function StaffLoginForm({ branding }: { branding: WorkshopBranding }) {
               placeholder="123456"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className={authInputClass}
+              className={authInputClass(dark)}
             />
           </AuthField>
           <button type="submit" disabled={loading} className={authButtonClass}>

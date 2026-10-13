@@ -25,6 +25,8 @@ function revalidateBrandedPages() {
   revalidatePath("/");
   revalidatePath("/book");
   revalidatePath("/portal/login");
+  revalidatePath("/staff/login");
+  revalidatePath("/staff/mfa-enroll");
 }
 
 export async function updateBrandColor(formData: FormData) {
@@ -53,6 +55,22 @@ export async function setWorkshopLogo(logoUrl: string) {
     .select("id");
   if (error || !data || data.length === 0) {
     throw new Error(error?.message ?? "Could not save logo");
+  }
+
+  revalidateBrandedPages();
+}
+
+export async function updateStaffTheme(formData: FormData) {
+  const { supabase, workshopId } = await getOwnWorkshopId();
+  const staffTheme = formData.get("staff_theme") as string;
+
+  const { error, data } = await supabase
+    .from("workshops")
+    .update({ staff_theme: staffTheme })
+    .eq("id", workshopId)
+    .select("id");
+  if (error || !data || data.length === 0) {
+    throw new Error(error?.message ?? "Could not save staff theme");
   }
 
   revalidateBrandedPages();

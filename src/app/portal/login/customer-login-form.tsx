@@ -73,7 +73,7 @@ export function CustomerLoginForm({ branding }: { branding: WorkshopBranding }) 
               placeholder="+61 4xx xxx xxx"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className={authInputClass}
+              className={authInputClass()}
             />
           </AuthField>
           <button type="submit" disabled={loading} className={authButtonClass}>
@@ -91,7 +91,7 @@ export function CustomerLoginForm({ branding }: { branding: WorkshopBranding }) 
               placeholder="123456"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className={authInputClass}
+              className={authInputClass()}
             />
           </AuthField>
           <button type="submit" disabled={loading} className={authButtonClass}>

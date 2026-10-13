@@ -63,13 +63,16 @@ export function MfaEnrollForm({ branding }: { branding: WorkshopBranding }) {
     router.refresh();
   }
 
+  const dark = branding.staffTheme === "dark";
+
   return (
     <AuthCard
       title="Set up two-factor login"
       logoUrl={branding.logoUrl}
       brandColor={branding.brandColor}
+      dark={dark}
     >
-      <p className="mb-5 text-center text-sm text-gray-500">
+      <p className={`mb-5 text-center text-sm ${dark ? "text-gray-400" : "text-gray-500"}`}>
         Staff accounts require an authenticator app (Google Authenticator, 1Password,
         Authy, etc.) in addition to your password. Scan this code to add Bayloop.
       </p>
@@ -77,20 +80,22 @@ export function MfaEnrollForm({ branding }: { branding: WorkshopBranding }) {
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
       {qrCode && (
-        <div className="mb-4 flex justify-center rounded-lg bg-[#F2F3F3] p-4">
+        <div
+          className={`mb-4 flex justify-center rounded-lg p-4 ${dark ? "bg-[#2E3033]" : "bg-[#F2F3F3]"}`}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={qrCode} alt="Scan with your authenticator app" className="h-40 w-40" />
         </div>
       )}
 
       {secret && (
-        <p className="mb-5 text-center text-xs text-gray-500">
+        <p className={`mb-5 text-center text-xs ${dark ? "text-gray-400" : "text-gray-500"}`}>
           Can&apos;t scan? Enter this code manually: <code>{secret}</code>
         </p>
       )}
 
       <form onSubmit={confirmEnrollment}>
-        <AuthField label="6-digit code from the app" required>
+        <AuthField label="6-digit code from the app" required dark={dark}>
           <input
             id="code"
             type="text"
@@ -99,7 +104,7 @@ export function MfaEnrollForm({ branding }: { branding: WorkshopBranding }) {
             placeholder="123456"
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            className={authInputClass}
+            className={authInputClass(dark)}
           />
         </AuthField>
         <button type="submit" disabled={loading || !factorId} className={authButtonClass}>

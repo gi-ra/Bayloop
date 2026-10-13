@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { connectStripe, refreshStripeStatus } from "@/app/actions/stripe-connect";
-import { updateBrandColor } from "@/app/actions/branding";
+import { updateBrandColor, updateStaffTheme } from "@/app/actions/branding";
 import { LogoUpload } from "@/components/logo-upload";
 
 export default async function AdminSettingsPage({
@@ -25,7 +25,7 @@ export default async function AdminSettingsPage({
     .single();
   const { data: workshop } = await supabase
     .from("workshops")
-    .select("name, stripe_account_id, stripe_onboarding_complete, brand_color, logo_url")
+    .select("name, stripe_account_id, stripe_onboarding_complete, brand_color, logo_url, staff_theme")
     .eq("id", profile?.workshop_id ?? "")
     .single();
 
@@ -79,13 +79,32 @@ export default async function AdminSettingsPage({
         </button>
       </form>
 
-      <div>
+      <div className="mb-8">
         <label className="mb-1 block text-sm font-medium">Logo</label>
         <LogoUpload
           workshopId={profile?.workshop_id ?? ""}
           currentLogoUrl={workshop?.logo_url ?? null}
         />
       </div>
+
+      <h2 className="mb-2 text-sm font-semibold uppercase text-gray-500">Staff login theme</h2>
+      <p className="mb-3 text-sm text-gray-600">
+        Light or dark look for the staff login and two-factor setup pages (customer-facing
+        pages always stay light/branded).
+      </p>
+      <form action={updateStaffTheme} className="flex items-center gap-3">
+        <select
+          name="staff_theme"
+          defaultValue={workshop?.staff_theme ?? "light"}
+          className="rounded border px-3 py-2 text-sm"
+        >
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+        <button type="submit" className="rounded bg-black px-4 py-2 text-white">
+          Save
+        </button>
+      </form>
     </main>
   );
 }

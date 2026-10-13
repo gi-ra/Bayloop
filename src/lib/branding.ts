@@ -6,12 +6,14 @@ export type WorkshopBranding = {
   name: string;
   logoUrl: string | null;
   brandColor: string;
+  staffTheme: "light" | "dark";
 };
 
 const DEFAULT_BRANDING: WorkshopBranding = {
   name: "Bayloop",
   logoUrl: null,
   brandColor: "#2F7A73",
+  staffTheme: "light",
 };
 
 // Single-workshop deployment for now, so this just grabs the one
@@ -22,7 +24,7 @@ export async function getWorkshopBranding(
 ): Promise<WorkshopBranding> {
   const { data } = await supabase
     .from("workshops")
-    .select("name, logo_url, brand_color")
+    .select("name, logo_url, brand_color, staff_theme")
     .limit(1)
     .maybeSingle();
 
@@ -32,5 +34,6 @@ export async function getWorkshopBranding(
     name: data.name,
     logoUrl: data.logo_url,
     brandColor: data.brand_color,
+    staffTheme: (data.staff_theme as "light" | "dark") ?? "light",
   };
 }
