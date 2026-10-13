@@ -45,6 +45,9 @@ export default async function InboxPage() {
                   {m.customers
                     ? `${m.customers.first_name ?? ""} ${m.customers.last_name ?? ""} (${m.customers.phone ?? ""})`
                     : "Unknown"}
+                  <span className="ml-2 rounded bg-gray-100 px-1.5 py-0.5 text-xs uppercase">
+                    {m.channel}
+                  </span>
                 </span>
                 <span>{new Date(m.sent_at).toLocaleString([], { hour: "numeric", minute: "2-digit", day: "numeric", month: "short" })}</span>
               </div>
