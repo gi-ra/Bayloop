@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createStaffAccount, resetStaffTwoFactor } from "@/app/actions/staff";
@@ -22,12 +21,7 @@ export default async function StaffPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Staff</h1>
-        <Link href="/admin" className="text-sm underline">
-          Diary
-        </Link>
-      </div>
+      <h1 className="mb-4 text-xl font-semibold">Staff</h1>
 
       <div className="mb-8 flex flex-col gap-2">
         {staffWithMfaStatus.map((s) => (

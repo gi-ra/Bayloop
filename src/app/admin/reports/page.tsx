@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getJobProfitRows } from "@/lib/reports";
 
@@ -79,12 +78,7 @@ export default async function ReportsPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Reports</h1>
-        <Link href="/admin" className="text-sm underline">
-          Diary
-        </Link>
-      </div>
+      <h1 className="mb-6 text-xl font-semibold">Reports</h1>
 
       <section className="mb-8">
         <div className="mb-2 flex items-center justify-between">

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { orderPart, receivePart } from "@/app/actions/parts";
 
@@ -31,17 +30,7 @@ export default async function PartsQueuePage() {
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Parts queue</h1>
-        <div className="flex gap-4">
-          <Link href="/admin/stock" className="text-sm underline">
-            Stock
-          </Link>
-          <Link href="/admin" className="text-sm underline">
-            Diary
-          </Link>
-        </div>
-      </div>
+      <h1 className="mb-4 text-xl font-semibold">Parts queue</h1>
 
       {!requests || requests.length === 0 ? (
         <p className="text-gray-600">No part requests yet.</p>

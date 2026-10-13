@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { connectStripe, refreshStripeStatus } from "@/app/actions/stripe-connect";
 import { updateBrandColor, updateStaffTheme } from "@/app/actions/branding";
@@ -31,11 +30,7 @@ export default async function AdminSettingsPage({
 
   return (
     <main className="mx-auto max-w-lg px-4 py-8">
-      <Link href="/admin" className="text-sm underline">
-        Back to diary
-      </Link>
-
-      <h1 className="mb-6 mt-2 text-xl font-semibold">Settings</h1>
+      <h1 className="mb-6 text-xl font-semibold">Settings</h1>
 
       <h2 className="mb-2 text-sm font-semibold uppercase text-gray-500">
         Online payments (Stripe)

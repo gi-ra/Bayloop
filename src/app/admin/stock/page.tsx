@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { upsertStockItem } from "@/app/actions/parts";
 
@@ -11,17 +10,7 @@ export default async function StockPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Stock</h1>
-        <div className="flex gap-4">
-          <Link href="/admin/parts" className="text-sm underline">
-            Parts queue
-          </Link>
-          <Link href="/admin" className="text-sm underline">
-            Diary
-          </Link>
-        </div>
-      </div>
+      <h1 className="mb-4 text-xl font-semibold">Stock</h1>
 
       <div className="mb-6 flex flex-col gap-2">
         {!items || items.length === 0 ? (

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { addQuoteLine, sendQuote } from "@/app/actions/quotes";
@@ -98,11 +97,7 @@ export default async function AdminJobDetailPage({
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/admin" className="text-sm underline">
-        Back to diary
-      </Link>
-
-      <h1 className="mb-1 mt-2 text-xl font-semibold">
+      <h1 className="mb-1 text-xl font-semibold">
         {vehicle?.make} {vehicle?.model} ({vehicle?.rego})
       </h1>
       <p className="mb-6 text-gray-600">

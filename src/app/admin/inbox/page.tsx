@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
 type MessageRow = {
@@ -21,12 +20,7 @@ export default async function InboxPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Inbox</h1>
-        <Link href="/admin" className="text-sm underline">
-          Diary
-        </Link>
-      </div>
+      <h1 className="mb-4 text-xl font-semibold">Inbox</h1>
 
       {!messages || messages.length === 0 ? (
         <p className="text-gray-600">No messages yet.</p>
