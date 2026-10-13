@@ -97,7 +97,7 @@ export function StaffLoginForm({ branding }: { branding: WorkshopBranding }) {
 
   return (
     <AuthCard
-      title={step === "password" ? "Staff login" : "Enter your two-factor code"}
+      title={step === "password" ? "Login" : "Enter your two-factor code"}
       logoUrl={branding.logoUrl}
       brandColor={branding.brandColor}
       dark={dark}
