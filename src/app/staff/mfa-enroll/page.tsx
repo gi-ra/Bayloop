@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { AuthCard, AuthField, authInputClass, authButtonClass } from "@/components/auth-card";
 
 export default function MfaEnrollPage() {
   const router = useRouter();
@@ -62,47 +63,44 @@ export default function MfaEnrollPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4">
-      <h1 className="text-2xl font-semibold">Set up two-factor login</h1>
-      <p className="text-sm text-gray-600">
+    <AuthCard title="Set up two-factor login">
+      <p className="mb-5 text-center text-sm text-gray-500">
         Staff accounts require an authenticator app (Google Authenticator, 1Password,
         Authy, etc.) in addition to your password. Scan this code to add Bayloop.
       </p>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
       {qrCode && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={qrCode} alt="Scan with your authenticator app" className="h-48 w-48 self-center" />
+        <div className="mb-4 flex justify-center rounded-lg bg-[#F2F3F3] p-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={qrCode} alt="Scan with your authenticator app" className="h-40 w-40" />
+        </div>
       )}
 
       {secret && (
-        <p className="text-xs text-gray-500">
+        <p className="mb-5 text-center text-xs text-gray-500">
           Can&apos;t scan? Enter this code manually: <code>{secret}</code>
         </p>
       )}
 
-      <form onSubmit={confirmEnrollment} className="flex flex-col gap-3">
-        <label className="text-sm font-medium" htmlFor="code">
-          Enter the 6-digit code from the app to confirm
-        </label>
-        <input
-          id="code"
-          type="text"
-          inputMode="numeric"
-          required
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          className="rounded border px-3 py-2"
-        />
-        <button
-          type="submit"
-          disabled={loading || !factorId}
-          className="rounded bg-black px-3 py-2 text-white disabled:opacity-50"
-        >
+      <form onSubmit={confirmEnrollment}>
+        <AuthField label="6-digit code from the app" required>
+          <input
+            id="code"
+            type="text"
+            inputMode="numeric"
+            required
+            placeholder="123456"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            className={authInputClass}
+          />
+        </AuthField>
+        <button type="submit" disabled={loading || !factorId} className={authButtonClass}>
           {loading ? "Confirming..." : "Confirm and finish"}
         </button>
       </form>
-    </main>
+    </AuthCard>
   );
 }

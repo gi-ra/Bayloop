@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { AuthCard, AuthField, authInputClass, authButtonClass, authLinkClass } from "@/components/auth-card";
 
 export default function CustomerLoginPage() {
   const router = useRouter();
@@ -50,63 +51,52 @@ export default function CustomerLoginPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4">
-      <h1 className="text-2xl font-semibold">Boyta Auto Centre</h1>
-
+    <AuthCard title="Log in to Boyta Auto Centre">
       {step === "phone" ? (
-        <form onSubmit={sendCode} className="flex flex-col gap-3">
-          <label className="text-sm font-medium" htmlFor="phone">
-            Mobile number
-          </label>
-          <input
-            id="phone"
-            type="tel"
-            required
-            placeholder="+61 4xx xxx xxx"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="rounded border px-3 py-2"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded bg-black px-3 py-2 text-white disabled:opacity-50"
-          >
+        <form onSubmit={sendCode}>
+          <AuthField label="Mobile number" required>
+            <input
+              id="phone"
+              type="tel"
+              required
+              placeholder="+61 4xx xxx xxx"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className={authInputClass}
+            />
+          </AuthField>
+          <button type="submit" disabled={loading} className={authButtonClass}>
             {loading ? "Sending..." : "Send code"}
           </button>
         </form>
       ) : (
-        <form onSubmit={verifyCode} className="flex flex-col gap-3">
-          <label className="text-sm font-medium" htmlFor="code">
-            Enter the 6-digit code we texted you
-          </label>
-          <input
-            id="code"
-            type="text"
-            inputMode="numeric"
-            required
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            className="rounded border px-3 py-2"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded bg-black px-3 py-2 text-white disabled:opacity-50"
-          >
+        <form onSubmit={verifyCode}>
+          <AuthField label="6-digit code" required>
+            <input
+              id="code"
+              type="text"
+              inputMode="numeric"
+              required
+              placeholder="123456"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              className={authInputClass}
+            />
+          </AuthField>
+          <button type="submit" disabled={loading} className={authButtonClass}>
             {loading ? "Checking..." : "Continue"}
           </button>
           <button
             type="button"
             onClick={() => setStep("phone")}
-            className="text-sm underline"
+            className={`${authLinkClass} mt-4 block text-center w-full`}
           >
             Use a different number
           </button>
         </form>
       )}
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
-    </main>
+      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+    </AuthCard>
   );
 }
