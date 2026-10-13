@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { getSessionProfile } from "@/lib/auth/get-session-profile";
-import { SignOutButton } from "@/components/sign-out-button";
+import { createClient } from "@/lib/supabase/server";
+import { getWorkshopBranding } from "@/lib/branding";
+import { DashboardHeader } from "@/components/dashboard-header";
 
 const ALLOWED_ROLES = ["technician", "admin", "owner"];
 
@@ -21,12 +23,12 @@ export default async function TechLayout({
     redirect("/staff/login");
   }
 
+  const supabase = await createClient();
+  const branding = await getWorkshopBranding(supabase);
+
   return (
     <div>
-      <header className="flex items-center justify-between border-b px-4 py-3">
-        <span className="font-semibold">Bayloop — Technician</span>
-        <SignOutButton />
-      </header>
+      <DashboardHeader branding={branding} label="Technician" />
       {children}
     </div>
   );

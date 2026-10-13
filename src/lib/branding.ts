@@ -37,3 +37,15 @@ export async function getWorkshopBranding(
     staffTheme: (data.staff_theme as "light" | "dark") ?? "light",
   };
 }
+
+// For pages reached before anyone's identity is known (the shared staff
+// login form, reachable from Bayloop's own generic homepage) — shows
+// Bayloop's own identity, not any particular workshop's. Keeps the
+// dark/light preference though, since that's a UI choice, not a brand
+// reveal, and there's nowhere else to read it from pre-login.
+export function toPreLoginBranding(branding: WorkshopBranding): WorkshopBranding {
+  return {
+    ...DEFAULT_BRANDING,
+    staffTheme: branding.staffTheme,
+  };
+}
