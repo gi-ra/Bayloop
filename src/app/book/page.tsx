@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { createBooking } from "@/app/actions/public-booking";
+import { LegalFooter } from "@/components/legal-footer";
 
 type Service = {
   id: string;
@@ -131,6 +132,7 @@ export default function BookPage() {
   }
 
   return (
+    <>
     <main
       className="mx-auto max-w-md px-4 py-8"
       style={{ ["--brand" as string]: brandColor }}
@@ -323,5 +325,7 @@ export default function BookPage() {
 
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
     </main>
+    <LegalFooter />
+    </>
   );
 }

@@ -45,17 +45,19 @@ export function AuthCard({
   logoUrl,
   brandColor = DEFAULT_BRAND_COLOR,
   dark = false,
+  footer,
   children,
 }: {
   title: string;
   logoUrl?: string | null;
   brandColor?: string;
   dark?: boolean;
+  footer?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <main
-      className={`flex min-h-screen items-center justify-center px-4 py-10 ${
+      className={`flex min-h-screen flex-col items-center justify-center px-4 py-10 ${
         dark ? "bg-[#17181A]" : "bg-[#F4F5F5]"
       }`}
       style={{ ["--brand" as string]: brandColor }}
@@ -73,6 +75,7 @@ export function AuthCard({
         </h1>
         {children}
       </div>
+      {footer}
     </main>
   );
 }

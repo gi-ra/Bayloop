@@ -11,6 +11,7 @@ import {
   authLinkClass,
 } from "@/components/auth-card";
 import type { WorkshopBranding } from "@/lib/branding";
+import { LegalFooter } from "@/components/legal-footer";
 
 export function CustomerLoginForm({ branding }: { branding: WorkshopBranding }) {
   const router = useRouter();
@@ -62,6 +63,7 @@ export function CustomerLoginForm({ branding }: { branding: WorkshopBranding }) 
       title={`Log in to ${branding.name}`}
       logoUrl={branding.logoUrl}
       brandColor={branding.brandColor}
+      footer={<LegalFooter />}
     >
       {step === "phone" ? (
         <form onSubmit={sendCode}>

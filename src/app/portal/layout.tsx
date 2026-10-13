@@ -3,6 +3,7 @@ import { getSessionProfile } from "@/lib/auth/get-session-profile";
 import { createClient } from "@/lib/supabase/server";
 import { getWorkshopBranding } from "@/lib/branding";
 import { DashboardHeader } from "@/components/dashboard-header";
+import { LegalFooter } from "@/components/legal-footer";
 
 export default async function PortalLayout({
   children,
@@ -25,6 +26,7 @@ export default async function PortalLayout({
     <div>
       <DashboardHeader branding={branding} />
       {children}
+      <LegalFooter />
     </div>
   );
 }

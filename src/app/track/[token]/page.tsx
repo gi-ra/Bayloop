@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getWorkshopBranding } from "@/lib/branding";
 import { TrackerMessageForm } from "@/components/tracker-message-form";
+import { LegalFooter } from "@/components/legal-footer";
 
 const STATUS_STEPS = [
   { key: "checked_in", label: "Checked in" },
@@ -77,6 +78,7 @@ export default async function TrackPage({
       )}
 
       <TrackerMessageForm token={token} />
+      <LegalFooter />
     </main>
   );
 }
