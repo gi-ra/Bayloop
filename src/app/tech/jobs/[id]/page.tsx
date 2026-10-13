@@ -2,7 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { startInspection, updateInspectionItem } from "@/app/actions/inspections";
+import { requestPart } from "@/app/actions/parts";
 import { PhotoUpload } from "@/components/photo-upload";
+
+type PartsRequest = {
+  id: string;
+  description: string;
+  status: string;
+};
 
 type InspectionItem = {
   id: string;
@@ -60,6 +67,13 @@ export default async function TechJobDetailPage({
       if (data) photoSignedUrls[path] = data.signedUrl;
     }
   }
+
+  const { data: partsRequests } = await supabase
+    .from("parts_requests")
+    .select("id, description, status")
+    .eq("job_id", id)
+    .order("created_at", { ascending: false })
+    .returns<PartsRequest[]>();
 
   const vehicle = job.vehicles as unknown as {
     rego: string | null;
@@ -153,6 +167,34 @@ export default async function TechJobDetailPage({
           ))}
         </div>
       )}
+
+      <h2 className="mb-2 mt-6 text-sm font-semibold uppercase text-gray-500">
+        Parts requests
+      </h2>
+      <div className="mb-3 flex flex-col gap-2">
+        {!partsRequests || partsRequests.length === 0 ? (
+          <p className="text-gray-600">None requested yet.</p>
+        ) : (
+          partsRequests.map((p) => (
+            <div key={p.id} className="flex items-center justify-between rounded border px-3 py-2">
+              <span>{p.description}</span>
+              <span className="text-xs uppercase text-gray-500">{p.status}</span>
+            </div>
+          ))
+        )}
+      </div>
+      <form action={requestPart} className="flex gap-2">
+        <input type="hidden" name="job_id" value={job.id} />
+        <input
+          name="description"
+          placeholder="Part needed..."
+          required
+          className="flex-1 rounded border px-3 py-2 text-sm"
+        />
+        <button type="submit" className="rounded border px-3 py-2 text-sm">
+          Request
+        </button>
+      </form>
     </main>
   );
 }
