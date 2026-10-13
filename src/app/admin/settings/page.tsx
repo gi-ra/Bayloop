@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { connectStripe, refreshStripeStatus } from "@/app/actions/stripe-connect";
+import { updateBranding } from "@/app/actions/branding";
 
 export default async function AdminSettingsPage({
   searchParams,
@@ -19,7 +20,7 @@ export default async function AdminSettingsPage({
     .single();
   const { data: workshop } = await supabase
     .from("workshops")
-    .select("name, stripe_account_id, stripe_onboarding_complete")
+    .select("name, stripe_account_id, stripe_onboarding_complete, brand_color, logo_url")
     .eq("id", profile?.workshop_id ?? "")
     .single();
 
@@ -52,6 +53,40 @@ export default async function AdminSettingsPage({
           </form>
         </div>
       )}
+
+      <h2 className="mb-2 mt-8 text-sm font-semibold uppercase text-gray-500">Branding</h2>
+      <p className="mb-3 text-sm text-gray-600">
+        Controls the look of your public pages: homepage, booking, customer login, and the
+        live tracker link customers get texted.
+      </p>
+      <form action={updateBranding} className="flex flex-col gap-3">
+        <div>
+          <label className="mb-1 block text-sm font-medium">Brand color</label>
+          <input
+            name="brand_color"
+            type="color"
+            defaultValue={workshop?.brand_color ?? "#2F7A73"}
+            className="h-10 w-20 rounded border"
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium">Logo URL (optional)</label>
+          <input
+            name="logo_url"
+            type="url"
+            placeholder="https://..."
+            defaultValue={workshop?.logo_url ?? ""}
+            className="w-full rounded border px-3 py-2 text-sm"
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Link to an image hosted elsewhere (e.g. from your marketing site). Leave blank to
+            use the default Bayloop logo mark in your brand color.
+          </p>
+        </div>
+        <button type="submit" className="self-start rounded bg-black px-4 py-2 text-white">
+          Save branding
+        </button>
+      </form>
     </main>
   );
 }

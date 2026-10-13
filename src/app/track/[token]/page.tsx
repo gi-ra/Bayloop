@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getWorkshopBranding } from "@/lib/branding";
 
 const STATUS_STEPS = [
   { key: "checked_in", label: "Checked in" },
@@ -17,9 +18,10 @@ export default async function TrackPage({
   const { token } = await params;
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .rpc("get_job_by_tracker_token", { p_token: token })
-    .single();
+  const [{ data, error }, branding] = await Promise.all([
+    supabase.rpc("get_job_by_tracker_token", { p_token: token }).single(),
+    getWorkshopBranding(supabase),
+  ]);
 
   if (error || !data) notFound();
 
@@ -35,7 +37,10 @@ export default async function TrackPage({
   const currentIndex = STATUS_STEPS.findIndex((s) => s.key === job.status);
 
   return (
-    <main className="mx-auto max-w-sm px-4 py-10">
+    <main
+      className="mx-auto max-w-sm px-4 py-10"
+      style={{ ["--brand" as string]: branding.brandColor }}
+    >
       <h1 className="mb-1 text-xl font-semibold">
         {job.vehicle_make} {job.vehicle_model}
         {job.vehicle_rego && ` (${job.vehicle_rego})`}
@@ -47,7 +52,7 @@ export default async function TrackPage({
           <div key={step.key} className="flex items-center gap-3">
             <div
               className={`h-3 w-3 rounded-full ${
-                i <= currentIndex ? "bg-black" : "bg-gray-200"
+                i <= currentIndex ? "bg-[var(--brand)]" : "bg-gray-200"
               }`}
             />
             <span className={i <= currentIndex ? "font-medium" : "text-gray-400"}>

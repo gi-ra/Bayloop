@@ -1,4 +1,19 @@
-export function AuthLogo() {
+const DEFAULT_BRAND_COLOR = "#2F7A73";
+
+export function AuthLogo({
+  logoUrl,
+  brandColor = DEFAULT_BRAND_COLOR,
+}: {
+  logoUrl?: string | null;
+  brandColor?: string;
+}) {
+  if (logoUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={logoUrl} alt="" className="mx-auto mb-5 h-12 max-w-[180px] object-contain" />
+    );
+  }
+
   return (
     <svg
       width="56"
@@ -11,13 +26,13 @@ export function AuthLogo() {
     >
       <path
         d="M4 28c0-8.837 7.163-16 16-16s16 7.163 16 16"
-        stroke="#2F7A73"
+        stroke={brandColor}
         strokeWidth="6"
         strokeLinecap="round"
       />
       <path
         d="M52 8c0 8.837-7.163 16-16 16S20 16.837 20 8"
-        stroke="#2F7A73"
+        stroke={brandColor}
         strokeWidth="6"
         strokeLinecap="round"
       />
@@ -27,15 +42,22 @@ export function AuthLogo() {
 
 export function AuthCard({
   title,
+  logoUrl,
+  brandColor = DEFAULT_BRAND_COLOR,
   children,
 }: {
   title: string;
+  logoUrl?: string | null;
+  brandColor?: string;
   children: React.ReactNode;
 }) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#F4F5F5] px-4 py-10">
+    <main
+      className="flex min-h-screen items-center justify-center bg-[#F4F5F5] px-4 py-10"
+      style={{ ["--brand" as string]: brandColor }}
+    >
       <div className="w-full max-w-[420px] rounded-2xl bg-white px-8 py-10 shadow-sm">
-        <AuthLogo />
+        <AuthLogo logoUrl={logoUrl} brandColor={brandColor} />
         <h1 className="mb-7 text-center text-xl font-bold text-gray-900">{title}</h1>
         {children}
       </div>
@@ -64,9 +86,9 @@ export function AuthField({
 }
 
 export const authInputClass =
-  "w-full rounded-lg border-0 bg-[#F2F3F3] px-4 py-3 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2F7A73]";
+  "w-full rounded-lg border-0 bg-[#F2F3F3] px-4 py-3 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand)]";
 
 export const authButtonClass =
-  "w-full rounded-full bg-[#2F7A73] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#276861] disabled:opacity-50";
+  "w-full rounded-full bg-[var(--brand)] px-4 py-3 font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50";
 
-export const authLinkClass = "text-sm font-medium text-[#2F7A73] hover:underline";
+export const authLinkClass = "text-sm font-medium text-[var(--brand)] hover:underline";

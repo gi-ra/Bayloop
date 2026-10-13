@@ -26,6 +26,7 @@ export default function BookPage() {
   const [loading, setLoading] = useState(false);
 
   const [workshopId, setWorkshopId] = useState<string | null>(null);
+  const [brandColor, setBrandColor] = useState("#2F7A73");
   const [services, setServices] = useState<Service[]>([]);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
@@ -46,13 +47,16 @@ export default function BookPage() {
   useEffect(() => {
     async function load() {
       const [{ data: workshop }, { data: serviceRows }] = await Promise.all([
-        supabase.from("workshops").select("id").limit(1).single(),
+        supabase.from("workshops").select("id, brand_color").limit(1).single(),
         supabase
           .from("services")
           .select("id, name, description, price_min, price_max, estimated_minutes")
           .order("name"),
       ]);
-      if (workshop) setWorkshopId(workshop.id);
+      if (workshop) {
+        setWorkshopId(workshop.id);
+        setBrandColor(workshop.brand_color);
+      }
       if (serviceRows) setServices(serviceRows);
     }
     load();
@@ -127,7 +131,10 @@ export default function BookPage() {
   }
 
   return (
-    <main className="mx-auto max-w-md px-4 py-8">
+    <main
+      className="mx-auto max-w-md px-4 py-8"
+      style={{ ["--brand" as string]: brandColor }}
+    >
       <h1 className="mb-6 text-2xl font-semibold">Book a service</h1>
 
       {step === "service" && (
@@ -287,7 +294,7 @@ export default function BookPage() {
           <button
             type="submit"
             disabled={loading}
-            className="rounded bg-black px-3 py-2 text-white disabled:opacity-50"
+            className="rounded-full bg-[var(--brand)] px-3 py-2 font-semibold text-white disabled:opacity-50"
           >
             {loading ? "Booking..." : "Confirm booking"}
           </button>

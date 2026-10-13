@@ -1,23 +1,28 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { getWorkshopBranding } from "@/lib/branding";
+import { AuthLogo } from "@/components/auth-card";
 
 export default async function Home() {
   const supabase = await createClient();
-  const { data: services } = await supabase
-    .from("services")
-    .select("id, name, price_min, price_max")
-    .order("name");
+  const [{ data: services }, branding] = await Promise.all([
+    supabase.from("services").select("id, name, price_min, price_max").order("name"),
+    getWorkshopBranding(supabase),
+  ]);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4 py-12">
-      <div>
-        <h1 className="text-2xl font-semibold">Boyta Auto Centre</h1>
-        <p className="text-gray-600">Bayloop — workshop management system.</p>
+    <main
+      className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4 py-12"
+      style={{ ["--brand" as string]: branding.brandColor }}
+    >
+      <div className="text-center">
+        <AuthLogo logoUrl={branding.logoUrl} brandColor={branding.brandColor} />
+        <h1 className="text-2xl font-semibold">{branding.name}</h1>
       </div>
 
       <Link
         href="/book"
-        className="rounded bg-black px-4 py-3 text-center font-medium text-white"
+        className="rounded-full bg-[var(--brand)] px-4 py-3 text-center font-semibold text-white"
       >
         Book a service
       </Link>
