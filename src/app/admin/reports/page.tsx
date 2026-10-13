@@ -77,87 +77,87 @@ export default async function ReportsPage() {
     .order("created_at");
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="mb-6 text-xl font-semibold">Reports</h1>
+    <main className="mx-auto max-w-4xl px-6 py-8">
+      <h1 className="mb-6 text-2xl font-bold text-gray-900">Reports</h1>
 
-      <section className="mb-8">
-        <div className="mb-2 flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase text-gray-500">Job profit</h2>
-          <a href="/api/reports/job-profit" className="text-sm underline">
+      <div className="mb-6 grid grid-cols-2 gap-4">
+        <div className="rounded-xl border bg-white p-5 shadow-sm">
+          <div className="text-sm text-gray-500">Approval rate</div>
+          <div className="text-3xl font-bold text-gray-900">
+            {approvalRate !== null ? `${approvalRate}%` : "—"}
+          </div>
+        </div>
+        <div className="rounded-xl border bg-white p-5 shadow-sm">
+          <div className="text-sm text-gray-500">Comeback rate (30 days)</div>
+          <div className="text-3xl font-bold text-gray-900">
+            {comebackRate !== null ? `${comebackRate}%` : "—"}
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-6 overflow-hidden rounded-xl border bg-white shadow-sm">
+        <div className="flex items-center justify-between border-b px-5 py-3">
+          <h2 className="font-semibold text-gray-900">Job profit</h2>
+          <a href="/api/reports/job-profit" className="text-sm font-medium text-[var(--brand)] hover:underline">
             Export CSV
           </a>
         </div>
         {jobProfitRows.length === 0 ? (
-          <p className="text-gray-600">No completed jobs yet.</p>
+          <p className="px-5 py-8 text-center text-sm text-gray-500">No completed jobs yet.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-gray-500">
-                  <th className="pb-1 pr-4">Vehicle</th>
-                  <th className="pb-1 pr-4">Customer</th>
-                  <th className="pb-1 pr-4">Quoted</th>
-                  <th className="pb-1 pr-4">Parts cost</th>
-                  <th className="pb-1">Tech hours</th>
+                <tr className="border-b bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+                  <th className="px-5 py-2.5 font-medium">Vehicle</th>
+                  <th className="px-5 py-2.5 font-medium">Customer</th>
+                  <th className="px-5 py-2.5 font-medium">Quoted</th>
+                  <th className="px-5 py-2.5 font-medium">Parts cost</th>
+                  <th className="px-5 py-2.5 font-medium">Tech hours</th>
                 </tr>
               </thead>
               <tbody>
                 {jobProfitRows.map((r) => (
-                  <tr key={r.jobId} className="border-t">
-                    <td className="py-1 pr-4">{r.vehicle}</td>
-                    <td className="py-1 pr-4">{r.customer}</td>
-                    <td className="py-1 pr-4">${r.quotedTotal.toFixed(2)}</td>
-                    <td className="py-1 pr-4">${r.actualPartsCost.toFixed(2)}</td>
-                    <td className="py-1">{r.actualHours}h</td>
+                  <tr key={r.jobId} className="border-b last:border-0 hover:bg-gray-50">
+                    <td className="px-5 py-3 font-medium text-gray-900">{r.vehicle}</td>
+                    <td className="px-5 py-3 text-gray-600">{r.customer}</td>
+                    <td className="px-5 py-3 text-gray-600">${r.quotedTotal.toFixed(2)}</td>
+                    <td className="px-5 py-3 text-gray-600">${r.actualPartsCost.toFixed(2)}</td>
+                    <td className="px-5 py-3 text-gray-600">{r.actualHours}h</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         )}
-      </section>
+      </div>
 
-      <section className="mb-8">
-        <h2 className="mb-2 text-sm font-semibold uppercase text-gray-500">
-          Technician hours — last 7 days
-        </h2>
+      <div className="mb-6 overflow-hidden rounded-xl border bg-white shadow-sm">
+        <div className="border-b px-5 py-3">
+          <h2 className="font-semibold text-gray-900">Technician hours — last 7 days</h2>
+        </div>
         {hoursByTech.size === 0 ? (
-          <p className="text-gray-600">No clocked time yet.</p>
+          <p className="px-5 py-8 text-center text-sm text-gray-500">No clocked time yet.</p>
         ) : (
-          <div className="flex flex-col gap-1">
+          <div className="divide-y">
             {Array.from(hoursByTech.values()).map((t) => (
-              <div key={t.name} className="flex justify-between rounded border px-3 py-2">
-                <span>{t.name}</span>
-                <span>{Math.round(t.hours * 10) / 10}h</span>
+              <div key={t.name} className="flex justify-between px-5 py-3 text-sm">
+                <span className="font-medium text-gray-900">{t.name}</span>
+                <span className="text-gray-600">{Math.round(t.hours * 10) / 10}h</span>
               </div>
             ))}
           </div>
         )}
-      </section>
+      </div>
 
-      <section className="mb-8 grid grid-cols-2 gap-4">
-        <div className="rounded border p-4">
-          <div className="text-sm text-gray-500">Approval rate</div>
-          <div className="text-2xl font-semibold">
-            {approvalRate !== null ? `${approvalRate}%` : "—"}
-          </div>
+      <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
+        <div className="border-b px-5 py-3">
+          <h2 className="font-semibold text-gray-900">Cash position — unpaid invoices</h2>
         </div>
-        <div className="rounded border p-4">
-          <div className="text-sm text-gray-500">Comeback rate (30 days)</div>
-          <div className="text-2xl font-semibold">
-            {comebackRate !== null ? `${comebackRate}%` : "—"}
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <h2 className="mb-2 text-sm font-semibold uppercase text-gray-500">
-          Cash position — unpaid invoices
-        </h2>
         {!unpaidInvoices || unpaidInvoices.length === 0 ? (
-          <p className="text-gray-600">Nothing outstanding.</p>
+          <p className="px-5 py-8 text-center text-sm text-gray-500">Nothing outstanding.</p>
         ) : (
-          <div className="flex flex-col gap-1">
+          <div className="divide-y">
             {unpaidInvoices.map((inv) => {
               const customer = inv.customers as unknown as {
                 first_name: string | null;
@@ -167,11 +167,12 @@ export default async function ReportsPage() {
                 (Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24),
               );
               return (
-                <div key={inv.id} className="flex justify-between rounded border px-3 py-2">
-                  <span>
-                    {customer?.first_name} {customer?.last_name} — {inv.status}
+                <div key={inv.id} className="flex justify-between px-5 py-3 text-sm">
+                  <span className="font-medium text-gray-900">
+                    {customer?.first_name} {customer?.last_name}{" "}
+                    <span className="font-normal capitalize text-gray-500">({inv.status})</span>
                   </span>
-                  <span>
+                  <span className="text-gray-600">
                     ${inv.total.toFixed(2)} · {ageDays}d
                   </span>
                 </div>
@@ -179,7 +180,7 @@ export default async function ReportsPage() {
             })}
           </div>
         )}
-      </section>
+      </div>
     </main>
   );
 }

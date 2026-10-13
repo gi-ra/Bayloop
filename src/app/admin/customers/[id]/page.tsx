@@ -26,12 +26,12 @@ export default async function CustomerDetailPage({
     .order("rego");
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/admin/customers" className="text-sm underline">
-        Back to customers
+    <main className="mx-auto max-w-3xl px-6 py-8">
+      <Link href="/admin/customers" className="text-sm font-medium text-[var(--brand)] hover:underline">
+        ← Back to customers
       </Link>
 
-      <h1 className="mb-1 mt-2 text-xl font-semibold">
+      <h1 className="mb-1 mt-3 text-2xl font-bold text-gray-900">
         {customer.first_name} {customer.last_name}
       </h1>
       <p className="mb-6 text-gray-600">
@@ -39,35 +39,56 @@ export default async function CustomerDetailPage({
         {customer.email && ` · ${customer.email}`}
       </p>
 
-      <h2 className="mb-2 text-sm font-semibold uppercase text-gray-500">
-        Vehicles
-      </h2>
-      <div className="mb-6 flex flex-col gap-2">
+      <div className="mb-6 overflow-hidden rounded-xl border bg-white shadow-sm">
+        <div className="border-b px-5 py-3">
+          <h2 className="font-semibold text-gray-900">Vehicles</h2>
+        </div>
         {!vehicles || vehicles.length === 0 ? (
-          <p className="text-gray-600">No vehicles on file.</p>
+          <p className="px-5 py-8 text-center text-sm text-gray-500">No vehicles on file.</p>
         ) : (
-          vehicles.map((v) => (
-            <div key={v.id} className="rounded border px-4 py-2">
-              {v.make} {v.model} — {v.rego}
-            </div>
-          ))
+          <div className="divide-y">
+            {vehicles.map((v) => (
+              <div key={v.id} className="px-5 py-3 text-sm">
+                <span className="font-medium text-gray-900">
+                  {v.make} {v.model}
+                </span>
+                <span className="text-gray-500"> — {v.rego}</span>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
-      <h2 className="mb-2 text-sm font-semibold uppercase text-gray-500">
-        Add a vehicle
-      </h2>
-      <form action={createVehicle} className="flex flex-col gap-3">
-        <input type="hidden" name="customer_id" value={customer.id} />
-        <input name="rego" placeholder="Rego" required className="rounded border px-3 py-2" />
-        <div className="grid grid-cols-2 gap-3">
-          <input name="make" placeholder="Make" className="rounded border px-3 py-2" />
-          <input name="model" placeholder="Model" className="rounded border px-3 py-2" />
-        </div>
-        <button type="submit" className="rounded bg-black px-3 py-2 text-white">
-          Add vehicle
-        </button>
-      </form>
+      <div className="max-w-md rounded-xl border bg-white p-5 shadow-sm">
+        <h2 className="mb-3 font-semibold text-gray-900">Add a vehicle</h2>
+        <form action={createVehicle} className="flex flex-col gap-3">
+          <input type="hidden" name="customer_id" value={customer.id} />
+          <input
+            name="rego"
+            placeholder="Rego"
+            required
+            className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              name="make"
+              placeholder="Make"
+              className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+            />
+            <input
+              name="model"
+              placeholder="Model"
+              className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+            />
+          </div>
+          <button
+            type="submit"
+            className="self-start rounded-lg bg-[var(--brand)] px-4 py-2 text-sm font-medium text-white"
+          >
+            Add vehicle
+          </button>
+        </form>
+      </div>
     </main>
   );
 }
