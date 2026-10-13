@@ -40,7 +40,10 @@ export default async function AdminHomePage() {
       .not("status", "in", "(ready,paid,cancelled)")
       .order("promised_at")
       .returns<JobRow[]>(),
-    supabase.from("profiles").select("id, first_name, last_name").eq("role", "technician"),
+    supabase
+      .from("profiles")
+      .select("id, first_name, last_name, role")
+      .in("role", ["technician", "admin", "owner"]),
   ]);
 
   const notYetCheckedIn = (bookings ?? []).filter((b) => !b.jobs || b.jobs.length === 0);
@@ -88,6 +91,7 @@ export default async function AdminHomePage() {
                       {technicians.map((t) => (
                         <option key={t.id} value={t.id}>
                           {t.first_name} {t.last_name}
+                          {t.role !== "technician" && ` (${t.role})`}
                         </option>
                       ))}
                     </select>
