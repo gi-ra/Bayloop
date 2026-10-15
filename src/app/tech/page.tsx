@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { updateJobStatus } from "@/app/actions/jobs";
+import { PushSubscribeButton } from "@/components/push-subscribe-button";
 
 type JobRow = {
   id: string;
@@ -49,6 +50,8 @@ export default async function TechHomePage() {
   return (
     <main className="mx-auto max-w-lg px-4 py-6">
       <h1 className="mb-5 text-2xl font-bold text-gray-900">Run sheet</h1>
+
+      <PushSubscribeButton />
 
       {!jobs || jobs.length === 0 ? (
         <p className="rounded-xl border bg-white px-5 py-8 text-center text-gray-500 shadow-sm">

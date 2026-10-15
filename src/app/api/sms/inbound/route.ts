@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { notifyAssignedTechOfMessage } from "@/lib/push";
 
 // ClickSend posts incoming SMS replies here. Protected by a shared
 // secret in the URL (set this same value in both Render's env vars
@@ -56,6 +57,19 @@ export async function POST(request: NextRequest) {
     direction: "inbound",
     body,
   });
+
+  if (customer?.id) {
+    const { data: activeJob } = await admin
+      .from("jobs")
+      .select("id")
+      .eq("customer_id", customer.id)
+      .not("status", "in", "(ready,paid,cancelled)")
+      .limit(1)
+      .maybeSingle();
+    if (activeJob) {
+      await notifyAssignedTechOfMessage(activeJob.id, body);
+    }
+  }
 
   return NextResponse.json({ ok: true });
 }

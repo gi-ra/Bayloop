@@ -25,6 +25,15 @@ export function TrackerMessageForm({ token }: { token: string }) {
       setError(error.message);
       return;
     }
+
+    // Best-effort — if this fails, the message is still saved and will
+    // show up in the admin inbox either way.
+    fetch("/api/tracker/notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+    }).catch(() => {});
+
     setMessage("");
     setSent(true);
   }
