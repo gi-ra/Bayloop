@@ -40,7 +40,18 @@ export function PhotoUpload({
 
   return (
     <div>
-      <label className="inline-block cursor-pointer rounded border px-3 py-2 text-sm">
+      <label
+        className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-gray-300 px-3.5 py-1.5 text-sm font-medium text-gray-700 ${uploading ? "opacity-50" : ""}`}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path
+            d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+          />
+          <circle cx="12" cy="14" r="3.2" stroke="currentColor" strokeWidth="1.6" />
+        </svg>
         {uploading ? "Uploading..." : "Add photo or video"}
         <input
           type="file"

@@ -23,10 +23,20 @@ type InspectionItem = {
 };
 
 const RATINGS = [
-  { value: "good", label: "Good" },
-  { value: "monitor", label: "Monitor" },
-  { value: "urgent", label: "Urgent" },
+  { value: "good", label: "Good", activeClass: "bg-green-600 text-white border-green-600" },
+  { value: "monitor", label: "Monitor", activeClass: "bg-amber-500 text-white border-amber-500" },
+  { value: "urgent", label: "Urgent", activeClass: "bg-red-600 text-white border-red-600" },
 ];
+
+const PARTS_STATUS_COLORS: Record<string, string> = {
+  requested: "bg-gray-100 text-gray-700",
+  ordered: "bg-amber-100 text-amber-700",
+  received: "bg-green-100 text-green-700",
+  cancelled: "bg-red-100 text-red-700",
+};
+
+const inputClass =
+  "rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[var(--brand)] focus:bg-white focus:outline-none";
 
 export default async function TechJobDetailPage({
   params,
@@ -82,30 +92,49 @@ export default async function TechJobDetailPage({
     model: string | null;
   } | null;
 
+  const doneCount = items.filter((i) => i.rating).length;
+
   return (
     <main className="mx-auto max-w-lg px-4 py-6">
-      <Link href="/tech" className="text-sm underline">
-        Back to my jobs
+      <Link
+        href="/tech"
+        className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-gray-500"
+      >
+        <span aria-hidden>←</span> Run sheet
       </Link>
-      <h1 className="mb-6 mt-2 text-xl font-semibold">
-        {vehicle?.make} {vehicle?.model} ({vehicle?.rego})
-      </h1>
+
+      <div className="mb-5 flex items-start justify-between gap-3">
+        <h1 className="text-xl font-bold text-gray-900">
+          {vehicle?.make} {vehicle?.model}
+          {vehicle?.rego && <span className="text-gray-400"> · {vehicle.rego}</span>}
+        </h1>
+        {items.length > 0 && (
+          <span className="whitespace-nowrap rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
+            {doneCount}/{items.length} checked
+          </span>
+        )}
+      </div>
 
       {!inspection ? (
-        <form action={startInspection}>
-          <input type="hidden" name="job_id" value={job.id} />
-          <button
-            type="submit"
-            className="rounded bg-black px-4 py-3 text-base font-medium text-white"
-          >
-            Start inspection
-          </button>
-        </form>
+        <div className="rounded-2xl border bg-white p-6 text-center shadow-sm">
+          <p className="mb-4 text-sm text-gray-500">
+            No inspection started yet for this job.
+          </p>
+          <form action={startInspection}>
+            <input type="hidden" name="job_id" value={job.id} />
+            <button
+              type="submit"
+              className="rounded-full bg-[var(--brand)] px-6 py-3 text-base font-semibold text-white"
+            >
+              Start inspection
+            </button>
+          </form>
+        </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           {items.map((item) => (
-            <div key={item.id} className="rounded border p-4">
-              <div className="mb-2 font-medium">{item.label}</div>
+            <div key={item.id} className="rounded-2xl border bg-white p-4 shadow-sm">
+              <div className="mb-3 font-semibold text-gray-900">{item.label}</div>
 
               <form action={updateInspectionItem} className="flex flex-col gap-2">
                 <input type="hidden" name="item_id" value={item.id} />
@@ -115,8 +144,10 @@ export default async function TechJobDetailPage({
                   {RATINGS.map((r) => (
                     <label
                       key={r.value}
-                      className={`cursor-pointer rounded border px-3 py-2 text-sm ${
-                        item.rating === r.value ? "bg-black text-white" : ""
+                      className={`cursor-pointer rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                        item.rating === r.value
+                          ? r.activeClass
+                          : "border-gray-200 text-gray-600"
                       }`}
                     >
                       <input
@@ -135,32 +166,38 @@ export default async function TechJobDetailPage({
                   name="measurement"
                   placeholder="Measurement (e.g. 3mm tread)"
                   defaultValue={item.measurement ?? ""}
-                  className="rounded border px-3 py-2 text-sm"
+                  className={inputClass}
                 />
                 <textarea
                   name="notes"
                   placeholder="Notes"
                   defaultValue={item.notes ?? ""}
-                  className="rounded border px-3 py-2 text-sm"
+                  rows={2}
+                  className={inputClass}
                 />
-                <button type="submit" className="self-start rounded border px-3 py-1 text-sm">
+                <button
+                  type="submit"
+                  className="self-start rounded-full border border-gray-300 px-4 py-1.5 text-sm font-semibold text-gray-700"
+                >
                   Save
                 </button>
               </form>
 
-              <div className="mt-2 flex flex-wrap gap-2">
-                {item.photo_urls.map((path) =>
-                  photoSignedUrls[path] ? (
-                    <MediaThumb
-                      key={path}
-                      path={path}
-                      url={photoSignedUrls[path]}
-                      className="h-16 w-16 rounded object-cover"
-                    />
-                  ) : null,
-                )}
-              </div>
-              <div className="mt-2">
+              {item.photo_urls.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {item.photo_urls.map((path) =>
+                    photoSignedUrls[path] ? (
+                      <MediaThumb
+                        key={path}
+                        path={path}
+                        url={photoSignedUrls[path]}
+                        className="h-16 w-16 rounded-lg object-cover"
+                      />
+                    ) : null,
+                  )}
+                </div>
+              )}
+              <div className="mt-3">
                 <PhotoUpload itemId={item.id} jobId={job.id} workshopId={job.workshop_id} />
               </div>
             </div>
@@ -168,33 +205,44 @@ export default async function TechJobDetailPage({
         </div>
       )}
 
-      <h2 className="mb-2 mt-6 text-sm font-semibold uppercase text-gray-500">
-        Parts requests
-      </h2>
-      <div className="mb-3 flex flex-col gap-2">
+      <div className="mt-6 overflow-hidden rounded-2xl border bg-white shadow-sm">
+        <div className="border-b px-4 py-3">
+          <h2 className="font-semibold text-gray-900">Parts requests</h2>
+        </div>
+
         {!partsRequests || partsRequests.length === 0 ? (
-          <p className="text-gray-600">None requested yet.</p>
+          <p className="px-4 py-6 text-center text-sm text-gray-500">None requested yet.</p>
         ) : (
-          partsRequests.map((p) => (
-            <div key={p.id} className="flex items-center justify-between rounded border px-3 py-2">
-              <span>{p.description}</span>
-              <span className="text-xs uppercase text-gray-500">{p.status}</span>
-            </div>
-          ))
+          <div className="divide-y">
+            {partsRequests.map((p) => (
+              <div key={p.id} className="flex items-center justify-between gap-2 px-4 py-3">
+                <span className="text-sm text-gray-900">{p.description}</span>
+                <span
+                  className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${PARTS_STATUS_COLORS[p.status] ?? "bg-gray-100 text-gray-700"}`}
+                >
+                  {p.status}
+                </span>
+              </div>
+            ))}
+          </div>
         )}
+
+        <form action={requestPart} className="flex gap-2 border-t p-4">
+          <input type="hidden" name="job_id" value={job.id} />
+          <input
+            name="description"
+            placeholder="Part needed..."
+            required
+            className={`flex-1 ${inputClass}`}
+          />
+          <button
+            type="submit"
+            className="rounded-full bg-[var(--brand)] px-4 py-2 text-sm font-semibold text-white"
+          >
+            Request
+          </button>
+        </form>
       </div>
-      <form action={requestPart} className="flex gap-2">
-        <input type="hidden" name="job_id" value={job.id} />
-        <input
-          name="description"
-          placeholder="Part needed..."
-          required
-          className="flex-1 rounded border px-3 py-2 text-sm"
-        />
-        <button type="submit" className="rounded border px-3 py-2 text-sm">
-          Request
-        </button>
-      </form>
     </main>
   );
 }
